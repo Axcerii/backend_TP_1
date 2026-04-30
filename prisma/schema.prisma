@@ -22,3 +22,41 @@ model User {
 
   @@map("users")
 }
+
+model Artist {
+  id          Int     @id @default(autoincrement())
+  nickname    String
+  realName    String?
+  oldName     String?
+  jobs        String[]
+  description String?
+
+  // Many-to-many self-relation (both sides required for Prisma)
+  associatedArtists Artist[] @relation("ArtistToArtist")
+  associatedBy      Artist[] @relation("ArtistToArtist")
+
+  // Many-to-many with VoiceBank (Prisma creates the join table automatically)
+  voiceBanks VoiceBank[] @relation("ArtistToVoiceBank")
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  softDelete Boolean  @default(false)
+
+  @@map("artists")
+}
+
+model VoiceBank {
+  id       Int      @id @default(autoincrement())
+  name     String
+  language String[]
+  software String[]
+
+  // Many-to-many back-reference
+  artists Artist[] @relation("ArtistToVoiceBank")
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  softDelete Boolean  @default(false)
+
+  @@map("voiceBanks")
+}
