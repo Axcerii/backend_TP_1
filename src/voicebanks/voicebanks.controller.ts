@@ -1,34 +1,35 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { VoicebanksService } from './voicebanks.service';
 import { CreateVoicebankDto } from './dto/create-voicebank.dto';
 import { UpdateVoicebankDto } from './dto/update-voicebank.dto';
+import { PaginationDto } from '../users/dto/pagination.dto';
 
 @Controller('voicebanks')
 export class VoicebanksController {
-  constructor(private readonly voicebanksService: VoicebanksService) {}
+    constructor(private readonly voicebanksService: VoicebanksService) {}
 
-  @Post()
-  create(@Body() createVoicebankDto: CreateVoicebankDto) {
-    return this.voicebanksService.create(createVoicebankDto);
-  }
+    @Post()
+    create(@Body() createVoicebankDto: CreateVoicebankDto) {
+        return this.voicebanksService.create(createVoicebankDto);
+    }
 
-  @Get()
-  findAll() {
-    return this.voicebanksService.findAll();
-  }
+    @Get()
+    findAll(@Query() pagination: PaginationDto) {
+        return this.voicebanksService.findAll(pagination);
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.voicebanksService.findOne(+id);
-  }
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.voicebanksService.findOne(+id);
+    }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateVoicebankDto: UpdateVoicebankDto) {
-    return this.voicebanksService.update(+id, updateVoicebankDto);
-  }
+    @Patch(':id')
+    update(@Param('id') id: string, @Body() updateVoicebankDto: UpdateVoicebankDto) {
+        return this.voicebanksService.update(+id, updateVoicebankDto);
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.voicebanksService.remove(+id);
-  }
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+        return this.voicebanksService.remove(+id);
+    }
 }
