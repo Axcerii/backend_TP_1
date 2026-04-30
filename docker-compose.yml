@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: mypassword
       POSTGRES_DB: mydb
     ports:
-      - '5433:5433'
+      - '5434:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -18,13 +18,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: dev          # use the dev stage
     container_name: nest_app
     ports:
       - '3000:3000'
     depends_on:
       - db
     environment:
-      DATABASE_URL: postgresql://myuser:mypassword@db:5433/mydb?schema=public
+      DATABASE_URL: postgresql://myuser:mypassword@db:5432/mydb?schema=public
+    volumes:
+      - .:/usr/src/app                  # bind-mount your whole project
+      - /usr/src/app/node_modules       # keep container's node_modules intact
 
 volumes:
   postgres_data:

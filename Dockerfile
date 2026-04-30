@@ -1,25 +1,27 @@
-FROM node:20-alpine
+FROM node:20-alpine AS base
 
-# Create app directory
 WORKDIR /usr/src/app
 
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
 COPY package*.json ./
-
-# Install app dependencies
 RUN npm install
 
-# Bundle app source
-COPY . .
+# ── Development stage ─────────────────────────────────────────────────────────
+FROM base AS dev
 
-# Generate Prisma client
+# Generate Prisma client (source is mounted as a volume at runtime)
+COPY prisma ./prisma
 RUN npx prisma generate
 
-# Build the application
+# Source code is NOT copied here — it comes from the bind mount in docker-compose
+EXPOSE 3000
+CMD ["npm", "run", "start:dev"]
+
+# ── Production stage ──────────────────────────────────────────────────────────
+FROM base AS prod
+
+COPY . .
+RUN npx prisma generate
 RUN npm run build
 
-# Expose port
 EXPOSE 3000
-
-# Start the server using the production build
-CMD [ "npm", "run", "start:prod" ]
+CMD ["npm", "run", "start:prod"]
