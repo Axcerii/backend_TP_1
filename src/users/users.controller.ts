@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationDto } from './dto/pagination.dto';
+import { AdminGuard } from '../auth/guards/admin.guard';
 import * as nestjsBetterAuth from '@thallesp/nestjs-better-auth';
 
 @Controller('users')
@@ -28,6 +29,7 @@ export class UsersController {
     return { authenticated: !!session };
   }
   @Get()
+  @UseGuards(AdminGuard)
   findAll(@Query() pagination: PaginationDto) {
     return this.usersService.findAll(pagination);
   }
@@ -44,6 +46,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @UseGuards(AdminGuard)
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
   }

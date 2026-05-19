@@ -1,13 +1,18 @@
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException, UnauthorizedException } from '@nestjs/common';
+import { auth } from '../auth';
+import { fromNodeHeaders } from 'better-auth/node';
 
 @Injectable()
 export class AdminGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    
-    // In better-auth, the session/user is usually attached to the request by the auth package.
-    // We get the user object from the request.
-    const user = request.user;
+
+    // Fetch the session directly from better-auth using the request headers
+    const sessionData = await auth.api.getSession({
+      headers: fromNodeHeaders(request.headers),
+    });
+
+    const user = sessionData?.user;
 
     if (!user) {
       throw new UnauthorizedException('You must be logged in to access this resource.');
