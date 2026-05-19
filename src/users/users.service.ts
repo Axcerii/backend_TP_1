@@ -14,6 +14,7 @@ export class UsersService {
 
   async findAll(pagination: PaginationDto) {
     const limit = pagination.limit ?? 1;
+    const where = pagination.role ? { role: pagination.role } : {};
 
     // ── Offset / classic pagination ──────────────────────────────────────────────
     if (pagination.mode !== 'cursor') {
@@ -21,8 +22,8 @@ export class UsersService {
       const skip = (page - 1) * limit;
 
       const [data, total] = await Promise.all([
-        this.prisma.user.findMany({ skip, take: limit, orderBy: { id: 'asc' } }),
-        this.prisma.user.count(),
+        this.prisma.user.findMany({ where, skip, take: limit, orderBy: { id: 'asc' } }),
+        this.prisma.user.count({ where }),
       ]);
 
       return {
@@ -41,6 +42,7 @@ export class UsersService {
 
     // ── Cursor-based pagination ───────────────────────────────────────────────────
     const data = await this.prisma.user.findMany({
+      where,
       take: limit + 1, // fetch one extra to know if a next page exists
       ...(pagination.cursor && { cursor: { id: pagination.cursor }, skip: 1 }),
       orderBy: { id: 'asc' },

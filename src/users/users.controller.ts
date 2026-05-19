@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationDto } from './dto/pagination.dto';
 import { AdminGuard } from '../auth/guards/admin.guard';
+import { ParseRolePipe } from './pipes/parse-role.pipe';
 import * as nestjsBetterAuth from '@thallesp/nestjs-better-auth';
 
 @Controller('users')
@@ -30,8 +31,11 @@ export class UsersController {
   }
   @Get()
   @UseGuards(AdminGuard)
-  findAll(@Query() pagination: PaginationDto) {
-    return this.usersService.findAll(pagination);
+  findAll(
+    @Query() pagination: PaginationDto,
+    @Query('role', ParseRolePipe) role: PaginationDto['role'],
+  ) {
+    return this.usersService.findAll({ ...pagination, role });
   }
 
 

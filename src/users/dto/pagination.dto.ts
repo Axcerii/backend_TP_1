@@ -1,7 +1,8 @@
-import { IsOptional, IsInt, Min, IsIn, IsString } from 'class-validator';
+import { IsOptional, IsInt, Min, IsIn, IsString, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export type PaginationMode = 'offset' | 'cursor';
+export type UserRole = 'USER' | 'ADMIN';
 
 export class PaginationDto {
     /**
@@ -40,4 +41,11 @@ export class PaginationDto {
     @IsInt()
     @Min(1)
     limit?: number = 1;
+
+    // ── Filters ──────────────────────────────────────────────────────────────────
+
+    /** Filter users by role. Allowed values: 'USER', 'ADMIN'. */
+    @IsOptional()
+    @IsEnum(['USER', 'ADMIN'])
+    role?: UserRole;
 }
