@@ -24,14 +24,14 @@ describe('UsersService (Integration)', () => {
     it('should create a user in the real database', async () => {
       const result = await service.create({
         email: 'test@example.com',
-        firstName: 'John',
-        lastName: 'Doe',
+        name: 'John Doe',
       });
 
       expect(result).toBeDefined();
-      expect(result.id).toBeGreaterThan(0);
+      expect(result.id).toBeDefined();
+      expect(typeof result.id).toBe('string');
       expect(result.email).toBe('test@example.com');
-      expect(result.firstName).toBe('John');
+      expect(result.name).toBe('John Doe');
 
       // Verify it's actually in the database
       const dbUser = await ctx.prisma.user.findUnique({ where: { id: result.id } });
@@ -43,7 +43,7 @@ describe('UsersService (Integration)', () => {
   describe('findOne', () => {
     it('should return a user if it exists and compute fullName', async () => {
       const seeded = await ctx.prisma.user.create({
-        data: { email: 'jane@example.com', firstName: 'Jane', lastName: 'Smith' },
+        data: { email: 'jane@example.com', name: 'Jane Smith' },
       });
 
       const result = await service.findOne(seeded.id);
@@ -54,7 +54,7 @@ describe('UsersService (Integration)', () => {
     });
 
     it('should throw NotFoundException if user does not exist', async () => {
-      await expect(service.findOne(99999)).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('non-existent-id')).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -62,9 +62,9 @@ describe('UsersService (Integration)', () => {
     it('should return paginated users (offset)', async () => {
       await ctx.prisma.user.createMany({
         data: [
-          { email: 'u1@example.com', firstName: 'User', lastName: '1' },
-          { email: 'u2@example.com', firstName: 'User', lastName: '2' },
-          { email: 'u3@example.com', firstName: 'User', lastName: '3' },
+          { email: 'u1@example.com', name: 'User 1' },
+          { email: 'u2@example.com', name: 'User 2' },
+          { email: 'u3@example.com', name: 'User 3' },
         ],
       });
 
@@ -81,25 +81,25 @@ describe('UsersService (Integration)', () => {
   describe('update', () => {
     it('should update an existing user', async () => {
       const seeded = await ctx.prisma.user.create({
-        data: { email: 'old@example.com', firstName: 'Old', lastName: 'Name' },
+        data: { email: 'old@example.com', name: 'Old Name' },
       });
 
-      const result = await service.update(seeded.id, { firstName: 'New' });
-      expect(result.firstName).toBe('New');
+      const result = await service.update(seeded.id, { name: 'New Name' } as any);
+      expect(result.name).toBe('New Name');
 
       const dbUser = await ctx.prisma.user.findUnique({ where: { id: seeded.id } });
-      expect(dbUser?.firstName).toBe('New');
+      expect(dbUser?.name).toBe('New Name');
     });
 
     it('should throw NotFoundException when updating non-existent user', async () => {
-      await expect(service.update(99999, { firstName: 'test' })).rejects.toThrow(NotFoundException);
+      await expect(service.update('non-existent-id', { name: 'test' } as any)).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('remove', () => {
     it('should delete a user from the database', async () => {
       const seeded = await ctx.prisma.user.create({
-        data: { email: 'delete@example.com', firstName: 'To Delete' },
+        data: { email: 'delete@example.com', name: 'To Delete' },
       });
 
       await service.remove(seeded.id);

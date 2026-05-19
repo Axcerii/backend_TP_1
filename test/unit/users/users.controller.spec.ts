@@ -10,13 +10,14 @@ describe('UsersController', () => {
   let service: UsersService;
 
   const mockUser = {
-    id: 1,
+    id: '1',
     email: 'test@example.com',
-    firstName: 'John',
-    lastName: 'Doe',
+    name: 'John Doe',
     fullName: 'John Doe',
     createdAt: new Date(),
     updatedAt: new Date(),
+    emailVerified: false,
+    image: null,
   };
 
   const mockUsersService = {
@@ -48,7 +49,7 @@ describe('UsersController', () => {
 
   describe('create', () => {
     it('should create a user', async () => {
-      const createDto: CreateUserDto = { email: 'test@example.com', firstName: 'John', lastName: 'Doe' };
+      const createDto: CreateUserDto = { email: 'test@example.com', name: 'John Doe' };
       expect(await controller.create(createDto)).toEqual(mockUser);
       expect(service.create).toHaveBeenCalledWith(createDto);
     });
@@ -65,22 +66,22 @@ describe('UsersController', () => {
   describe('findOne', () => {
     it('should return a single user', async () => {
       expect(await controller.findOne('1')).toEqual(mockUser);
-      expect(service.findOne).toHaveBeenCalledWith(1);
+      expect(service.findOne).toHaveBeenCalledWith('1');
     });
   });
 
   describe('update', () => {
     it('should update a user', async () => {
-      const updateDto: UpdateUserDto = { firstName: 'Johnny' };
+      const updateDto: UpdateUserDto = { name: 'Johnny' } as any;
       expect(await controller.update('1', updateDto)).toEqual(mockUser);
-      expect(service.update).toHaveBeenCalledWith(1, updateDto);
+      expect(service.update).toHaveBeenCalledWith('1', updateDto);
     });
   });
 
   describe('remove', () => {
     it('should remove a user', async () => {
       expect(await controller.remove('1')).toEqual(mockUser);
-      expect(service.remove).toHaveBeenCalledWith(1);
+      expect(service.remove).toHaveBeenCalledWith('1');
     });
   });
 });

@@ -55,7 +55,7 @@ export class VoicebanksService {
 
         const data = await this.prisma.voiceBank.findMany({
             take: limit + 1,
-            ...(pagination.cursor && { cursor: { id: pagination.cursor }, skip: 1 }),
+            ...(pagination.cursor && { cursor: { id: parseInt(pagination.cursor, 10) }, skip: 1 }),
             orderBy: { id: 'asc' },
             include,
         });

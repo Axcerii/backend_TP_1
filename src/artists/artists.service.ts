@@ -64,7 +64,7 @@ export class ArtistsService {
 
         const data = await this.prisma.artist.findMany({
             take: limit + 1,
-            ...(pagination.cursor && { cursor: { id: pagination.cursor }, skip: 1 }),
+            ...(pagination.cursor && { cursor: { id: parseInt(pagination.cursor, 10) }, skip: 1 }),
             orderBy: { id: 'asc' },
             include,
         });
