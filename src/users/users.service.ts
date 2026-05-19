@@ -9,7 +9,7 @@ export class UsersService {
   constructor(private prisma: PrismaService) { }
 
   create(createUserDto: CreateUserDto) {
-    return this.prisma.user.create({ data: { email: createUserDto.email, firstName: createUserDto.firstName, lastName: createUserDto.lastName } });
+    return this.prisma.user.create({ data: { email: createUserDto.email, name: createUserDto.name } });
   }
 
   async findAll(pagination: PaginationDto) {
@@ -62,26 +62,27 @@ export class UsersService {
   }
 
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
     return {
       ...user,
-      fullName: [user.firstName, user.lastName].filter(Boolean).join(' ').trim() || null,
+      fullName: user.name,
     };
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto) {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
-    return this.prisma.user.update({ where: { id }, data: { firstName: updateUserDto.firstName, lastName: updateUserDto.lastName } });
+    // Need to cast the DTO since UpdateUserDto still uses firstName/lastName or is updated
+    return this.prisma.user.update({ where: { id }, data: { name: (updateUserDto as any).name } });
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return this.prisma.user.delete({ where: { id } });
   }
 }
